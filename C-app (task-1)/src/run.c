@@ -1,10 +1,10 @@
 #include "sim.h"
 
 int main(void) {
-    if (init()) {
-        return 1;
-    }
-    
-    app();
-    quit();
+  if (init()) {
+    return 1;
+  }
+
+  app();
+  quit();
 }
