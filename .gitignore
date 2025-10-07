@@ -1,2 +1,6 @@
 compile_flags.txt
 *.out
+*.dylib
+*.sh
+*_log.txt
+.DS_Store
