@@ -6,16 +6,22 @@
 #define WINDOW_WIDTH 1500
 #define WINDOW_HEIGHT 900
 
-int init(void);
+#ifdef __cplusplus
+    #define EXTERN extern "C"
+#else
+    #define EXTERN
+#endif
 
-void fill_init_state(int state[WINDOW_WIDTH / PIXEL_SCALE + 2][WINDOW_HEIGHT / PIXEL_SCALE + 2]);
+EXTERN int init(void);
 
-void put_pixel(int x, int y, int rgb);
+EXTERN void fill_init_state(int state[WINDOW_WIDTH / PIXEL_SCALE + 2][WINDOW_HEIGHT / PIXEL_SCALE + 2]);
 
-int flush(void);
+EXTERN void put_pixel(int x, int y, int rgb);
 
-void quit(void);
+EXTERN int flush(void);
 
-void app(void);
+EXTERN void quit(void);
+
+EXTERN void app(void);
 
 #endif
