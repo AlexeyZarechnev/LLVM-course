@@ -1,48 +1,36 @@
 === Top 10 Instruction Patterns ===
 Pattern 1: [
   getelementptr <- add
-  load <- getelementptr
-] - Count: 8104000
+] - Count: 13204000
 Pattern 2: [
   getelementptr <- alloca
-  getelementptr <- add
-] - Count: 6904000
+] - Count: 10803705
 Pattern 3: [
   load <- getelementptr
-  add <- add
-] - Count: 6900000
+] - Count: 9603705
 Pattern 4: [
-  add <- add
   add <- load
-] - Count: 6900000
+] - Count: 8400000
 Pattern 5: [
-  load <- getelementptr
-  add <- add
-  add <- load
-] - Count: 6900000
+  getelementptr <- phi
+] - Count: 8399410
 Pattern 6: [
-  add <- load
-  getelementptr <- alloca
-] - Count: 6300000
+  getelementptr <- add
+  load <- getelementptr
+] - Count: 7204000
 Pattern 7: [
-  add <- load
+  add <- add
+] - Count: 7200000
+Pattern 8: [
   getelementptr <- alloca
   getelementptr <- add
-] - Count: 6300000
-Pattern 8: [
+] - Count: 6004000
+Pattern 9: [
+  load <- getelementptr
+  add <- add
+] - Count: 6000000
+Pattern 10: [
   load <- getelementptr
   add <- add
   add <- load
-  getelementptr <- alloca
-] - Count: 5550000
-Pattern 9: [
-  add <- add
-  add <- load
-  getelementptr <- alloca
-  getelementptr <- add
-] - Count: 5550000
-Pattern 10: [
-  add <- add
-  add <- load
-  getelementptr <- alloca
-] - Count: 5550000
+] - Count: 6000000
