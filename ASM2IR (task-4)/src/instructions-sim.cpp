@@ -20,7 +20,7 @@ struct Cleaner {
       delete[] ptr;
     }
   }
-  std::vector<char *> allocated_memory;
+  std::vector<uint32_t *> allocated_memory;
 };
 
 static Cleaner cleaner;
@@ -127,21 +127,17 @@ void Instruction<instructions::MUL>::build(
 void alloca_sim(const char* dst, const char* size) noexcept {
   uint64_t alloc_size = get_value(size);
 
-  char *memory = new char[alloc_size];
+  uint32_t *memory = new uint32_t[alloc_size];
   REGISTERS[get_num(dst)] = reinterpret_cast<uint64_t>(memory);
   cleaner.allocated_memory.push_back(memory);
-
-  llvm::outs() << "Allocated from" << reinterpret_cast<uint64_t>(memory) << " to " << reinterpret_cast<uint64_t>(memory + alloc_size) << "\n";
 }
-
-//4909598928
 
 void Instruction<instructions::ALLOCA>::build(
     std::istream &input, llvm::IRBuilder<> &builder) noexcept {
   builder.CreateCall(alloca_sim_func, parse_args<2>(input, builder));
 }
 
-void gep2_sim(const char* dst, const char* base, const char* ptr,
+void gep2_sim(const char* size, const char* dst, const char* base, const char* ptr,
               const char* idx1, const char* idx2,
               const char* off1, const char* off2) noexcept {
   uint64_t base_size = get_value(base);
@@ -151,15 +147,13 @@ void gep2_sim(const char* dst, const char* base, const char* ptr,
   uint64_t offset1 = get_value(off1);
   uint64_t offset2 = get_value(off2);
 
-  // llvm::outs() << ", index1: " << index1 << ", index2: " << index2 << "\n";
-
   REGISTERS[get_num(dst)] =
       ptr_addr + ((index1 + offset1) * base_size + (index2 + offset2)) * 4;
 }
 
 void Instruction<instructions::GEP2>::build(
     std::istream &input, llvm::IRBuilder<> &builder) noexcept {
-  builder.CreateCall(gep2_sim_func, parse_args<7>(input, builder));
+  builder.CreateCall(gep2_sim_func, parse_args<8>(input, builder));
 }
 
 void load_sim(const char* dst, const char* addr) noexcept {
@@ -190,8 +184,6 @@ void eq_sim(const char* dst, const char* src1,
             const char* src2) noexcept {
   uint64_t val1 = get_value(src1);
   uint64_t val2 = get_value(src2);
-
-  // llvm::outs() << "EQ: " << val1 << " == " << val2 << "\n";
 
   REGISTERS[get_num(dst)] = (val1 == val2) ? 1 : 0;
 }
@@ -294,7 +286,7 @@ void init_builder(llvm::IRBuilder<> &builder, llvm::Module *module) noexcept {
   sub_sim_func = init_func<3>(void_type, string_type, module, "sub");
   mul_sim_func = init_func<3>(void_type, string_type, module, "mul");
   alloca_sim_func = init_func<2>(void_type, string_type, module, "alloca");
-  gep2_sim_func = init_func<7>(void_type, string_type, module, "gep2");
+  gep2_sim_func = init_func<8>(void_type, string_type, module, "gep2");
   load_sim_func = init_func<2>(void_type, string_type, module, "load");
   store_sim_func = init_func<2>(void_type, string_type, module, "store");
   eq_sim_func = init_func<3>(void_type, string_type, module, "eq");

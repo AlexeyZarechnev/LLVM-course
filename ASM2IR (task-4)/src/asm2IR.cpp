@@ -81,12 +81,12 @@ int main(int argc, char** argv) {
 
     std::string command;
     while (input >> command) {
-        if (command.empty()) {
+        if (command.empty() || command == "//") {
             continue;
         }
         if (command.ends_with(":")) {
             llvm::BasicBlock* block = label_blocks[command.substr(0, command.size() - 1)];
-            if (!builder.GetInsertBlock()->back().isTerminator()) {
+            if (builder.GetInsertBlock()->empty() || !builder.GetInsertBlock()->back().isTerminator()) {
                 builder.CreateBr(block);
             }
             builder.SetInsertPoint(block);
@@ -105,21 +105,23 @@ int main(int argc, char** argv) {
     bool verified = llvm::verifyModule(*module, &llvm::outs());
     llvm::outs() << "[VERIFICATION] " << (verified ? "FAIL\n\n" : "OK\n\n");
 
-    // LLVM IR Interpreter
-    llvm::outs() << "[EE] Run\n";
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
+    if (!verified) {
+        // LLVM IR Interpreter
+        llvm::outs() << "[EE] Run\n";
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
 
-    llvm::ExecutionEngine *ee = llvm::EngineBuilder(std::unique_ptr<llvm::Module>(module)).create();
-    map_functions(ee);
-    ee->finalizeObject();
+        llvm::ExecutionEngine *ee = llvm::EngineBuilder(std::unique_ptr<llvm::Module>(module)).create();
+        map_functions(ee);
+        ee->finalizeObject();
 
-    init();
+        init();
 
-    llvm::ArrayRef<llvm::GenericValue> noargs;
-    llvm::GenericValue v = ee->runFunction(main_function, noargs);
-    llvm::outs() << "[EE] Result: " << v.IntVal << '\n';
+        llvm::ArrayRef<llvm::GenericValue> noargs;
+        llvm::GenericValue v = ee->runFunction(main_function, noargs);
+        llvm::outs() << "[EE] Result: " << v.IntVal << '\n';
 
-    quit();
+        quit();
+    }
     return EXIT_SUCCESS;
 }
